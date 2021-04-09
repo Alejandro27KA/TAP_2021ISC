@@ -1,0 +1,153 @@
+Public Class Form1
+
+    Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Try
+            ComboBox1.Items.Clear()
+
+            For Each fuentes As FontFamily In FontFamily.Families
+                Dim tipo As String
+                tipo = fuentes.Name
+            Next
+            Try
+                ComboBox1.Text = "Calibri"
+            Catch ex As Exception
+                ComboBox1.SelectedIndex = 0
+            End Try
+
+        Catch ex As Exception
+
+        End Try
+    End Sub
+
+    Private Sub ComboBox1_DrawItem(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DrawItemEventArgs) Handles ComboBox1.DrawItem
+        e.DrawBackground()
+        Dim texto As String = ComboBox1.Items(e.Index).ToString
+        Dim fon As New Font(texto, e.Font.Size)
+
+        e.Graphics.DrawString(texto, fon, New SolidBrush(e.ForeColor), e.Bounds.Left + 2, e.Bounds.Top + 2)
+        e.DrawFocusRectangle()
+
+    End Sub
+    Dim negrilla As Boolean = False
+    Dim cursiva As Boolean = False
+
+    Private Sub Label2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Label2.Click
+        If negrilla = False Then
+            RichTextBox1.SelectionFont = New Font(ComboBox1.Text, Int(TextBox1.Text), FontStyle.Bold)
+            Label2.ForeColor = Color.Chocolate
+            negrilla = True
+        Else
+            RichTextBox1.SelectionFont = New Font(ComboBox1.Text, Int(TextBox1.Text), FontStyle.Regular)
+            Label2.ForeColor = Color.White
+            negrilla = False
+        End If
+
+    End Sub
+
+    Private Sub Label3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Label3.Click
+        Try
+            If cursiva = False Then
+                RichTextBox1.SelectionFont = New Font(ComboBox1.Text, Int(TextBox1.Text), FontStyle.Italic)
+                Label3.ForeColor = Color.Chocolate
+                cursiva = True
+            Else
+                RichTextBox1.SelectionFont = New Font(ComboBox1.Text, Int(TextBox1.Text), FontStyle.Regular)
+                Label3.ForeColor = Color.White
+                cursiva = True
+            End If
+        Catch ex As Exception
+
+        End Try
+    End Sub
+
+    Private Sub TextBox1_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TextBox1.TextChanged
+        Try
+            If negrilla = True Then
+                RichTextBox1.SelectionFont = New Font(ComboBox1.Text, Int(TextBox1.Text), FontStyle.Bold)
+            Else
+                RichTextBox1.SelectionFont = New Font(ComboBox1.Text, Int(TextBox1.Text), FontStyle.Regular)
+            End If
+
+        Catch ex As Exception
+
+        End Try
+
+    End Sub
+
+    Private Sub PictureBox1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PictureBox1.Click
+        Try
+            Dim dig As ColorDialog = New ColorDialog
+            dig.Color = RichTextBox1.SelectionColor
+            If dig.ShowDialog = System.Windows.Forms.DialogResult.OK Then
+                RichTextBox1.SelectionColor = dig.Color
+
+                With RichTextBox1.SelectionColor = dig.Color
+                End With
+                PictureBox1.BackColor = dig.Color
+            End If
+        Catch ex As Exception
+
+        End Try
+
+    End Sub
+
+    Private Sub TrackBar1_Scroll(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TrackBar1.Scroll
+        Label7.Text = TrackBar1.Value = 100 & "%"
+        RichTextBox1.ZoomFactor = TrackBar1.Value
+
+    End Sub
+
+    Private Sub Abrir_ItemClicked(ByVal sender As System.Object, ByVal e As ToolStripItemClickedEventArgs) Handles Abrir.ItemClicked
+        Dim Open As New OpenFileDialog()
+        Dim myStreamReader As System.IO.StreamReader
+        Open.Filter = "Texto [*,txt*]|*,txt*|all files (*.*)|*.*"
+        Open.CheckPathExists = True
+        Open.Title = "Abrir Archivo"
+        Open.ShowDialog(Me)
+        Try
+            Open.OpenFile()
+            myStreamReader = System.IO.File.OpenText(Open.FileName)
+            RichTextBox1.Text = myStreamReader.ReadToEnd()
+        Catch ex As Exception
+
+        End Try
+
+    End Sub
+
+    Private Sub GuardarComo_ItemClicked(ByVal sender As System.Object, ByVal e As ToolStripItemClickedEventArgs) Handles GuardarComo.ItemClicked
+        Dim save As New SaveFileDialog()
+        Dim myStreamWriter As System.IO.StreamWriter
+        save.Filter = "texto (*.txt)|*.txt|Html (*.html*)|*.html|php(*.php*)|*.php*| All files (*.*)|*.*"
+        save.CheckPathExists = True
+        save.Title = "Guardar Como"
+        save.ShowDialog(Me)
+        Try
+            myStreamWriter = System.IO.File.AppendText(save.FileName)
+            myStreamWriter.Write(RichTextBox1.Text)
+            myStreamWriter.Flush()
+        Catch ex As Exception
+
+        End Try
+    End Sub
+    Dim estado As Integer = 0
+    Private Sub RichTextBox1_SelectionChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RichTextBox1.SelectionChanged
+        Try
+            ComboBox1.Text = RichTextBox1.SelectionFont.Name
+            TextBox1.Text = RichTextBox1.SelectionFont.Size
+            estado = RichTextBox1.SelectionFont.Style
+            If estado = 0 Then
+                Label2.ForeColor = Color.White
+                Label3.ForeColor = Color.White
+            ElseIf estado = 1 Then
+                Label2.ForeColor = Color.Chocolate
+                Label3.ForeColor = Color.White
+            ElseIf estado = 2 Then
+                Label2.ForeColor = Color.White
+                Label3.ForeColor = Color.Chocolate
+            End If
+            PictureBox1.BackColor = RichTextBox1.SelectionColor
+        Catch ex As Exception
+
+        End Try
+    End Sub
+End Class
